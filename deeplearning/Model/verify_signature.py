@@ -24,8 +24,7 @@ with open("Signature_verification(DL model).h5", "wb") as f:
     f.write(response.content)
 
 # Load the pre-trained model
-model_path = os.path.join(os.path.dirname(__file__), '../Signature_verification(DL model).h5')
-trained_model = load_model(model_path)
+trained_model =load_model("Signature_verification(DL model).h5")
 # Create Flask app
 app = Flask(__name__)
 CORS(app)
