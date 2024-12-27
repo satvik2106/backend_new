@@ -26,7 +26,7 @@ model_path = f"gs://{bucket_name}/{model_file_name}"
 
 try:
     # Use the system's temporary directory for storing the file
-    temp_dir = tempfile.gettempdir()  
+    temp_dir = tempfile.gettempdir()
     with tempfile.NamedTemporaryFile(suffix=".h5", dir=temp_dir, delete=False) as temp_file:
         with fs.open(model_path, 'rb') as gcs_file:
             temp_file.write(gcs_file.read())
@@ -40,6 +40,19 @@ except Exception as e:
 # Create Flask app
 app = Flask(__name__)
 CORS(app)
+
+# Health check endpoint to verify DL model functionality
+@app.route('/api/health-check', methods=['GET'])
+def health_check():
+    try:
+        # Dummy input to check if the model works
+        dummy_input = np.zeros((1, 224, 224, 3))  # Replace dimensions with your model's expected input
+        dummy_output = trained_model.predict(dummy_input)
+        
+        # Return a success message
+        return jsonify({"message": "DL model is working.", "dummy_output_shape": dummy_output.shape}), 200
+    except Exception as e:
+        return jsonify({"error": f"Model check failed: {str(e)}"}), 500
 
 # Function to retrieve and store the signature in a file
 def retrieve_and_store_signature(account_number):
