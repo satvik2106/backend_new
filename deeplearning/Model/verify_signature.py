@@ -9,11 +9,19 @@ import cv2
 import base64
 import os
 from pymongo import MongoClient
+import requests
 
 # MongoDB connection
 mongo_client = MongoClient("mongodb+srv://satvikvattipalli1311:8I4SOudfJO8n8fIp@signare.w1j4f.mongodb.net/?retryWrites=true&w=majority&appName=Signare")
 db = mongo_client.test
 collection = db.accounts
+
+
+# Download the file
+url = "https://drive.google.com/file/d/1ClYrxLDt-M_QanaZh-El5NnC14M2JISV/view?usp=sharing"
+response = requests.get(url)
+with open("Signature_verification(DL model).h5", "wb") as f:
+    f.write(response.content)
 
 # Load the pre-trained model
 model_path = os.path.join(os.path.dirname(__file__), '../Signature_verification(DL model).h5')
