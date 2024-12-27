@@ -16,6 +16,13 @@ mongo_client = MongoClient("mongodb+srv://satvikvattipalli1311:8I4SOudfJO8n8fIp@
 db = mongo_client.test
 collection = db.accounts
 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb+srv://satvikvattipalli1311:8I4SOudfJO8n8fIp@signare.w1j4f.mongodb.net/?retryWrites=true&w=majority&appName=Signare', {
+  useCreateIndex: true,  // Use this if applicable
+  useFindAndModify: false,  // Use this if applicable
+});
+
+
 # Google Cloud Storage configuration
 bucket_name = "signature_verification_storage"
 model_file_name = "Signature_verification(DL model).h5"
