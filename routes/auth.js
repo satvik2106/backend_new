@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
+const bcrypt = require('bcryptjs'); // Import bcrypt for password hashing
 const User = require('../models/User'); // Import the User model
 const Account = require('../models/Account'); // Import the Account model (for checking account numbers)
 const mongoose = require('mongoose'); // Import mongoose for accessing the connection details
