@@ -4,27 +4,39 @@ from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.preprocessing import image
 from sklearn.metrics.pairwise import cosine_similarity
 from flask_cors import CORS
-import matplotlib.pyplot as plt
 import cv2
 import base64
 import os
 from pymongo import MongoClient
-import requests
+import gcsfs
+import tempfile
 
 # MongoDB connection
 mongo_client = MongoClient("mongodb+srv://satvikvattipalli1311:8I4SOudfJO8n8fIp@signare.w1j4f.mongodb.net/?retryWrites=true&w=majority&appName=Signare")
 db = mongo_client.test
 collection = db.accounts
 
+# Google Cloud Storage configuration
+bucket_name = "signature_verification_storage"
+model_file_name = "Signature_verification(DL model).h5"
 
-# Download the file
-url = "https://drive.google.com/file/d/1ClYrxLDt-M_QanaZh-El5NnC14M2JISV/view?usp=sharing"
-response = requests.get(url)
-with open("Signature_verification(DL model).h5", "wb") as f:
-    f.write(response.content)
+# Access model from Google Cloud Storage
+fs = gcsfs.GCSFileSystem()
+model_path = f"gs://{bucket_name}/{model_file_name}"
 
-# Load the pre-trained model
-trained_model =load_model("Signature_verification(DL model).h5")
+try:
+    # Use the system's temporary directory for storing the file
+    temp_dir = tempfile.gettempdir()  
+    with tempfile.NamedTemporaryFile(suffix=".h5", dir=temp_dir, delete=False) as temp_file:
+        with fs.open(model_path, 'rb') as gcs_file:
+            temp_file.write(gcs_file.read())
+        temp_file.close()  # Explicitly close the file to ensure it's flushed
+        trained_model = load_model(temp_file.name)
+        os.unlink(temp_file.name)  # Remove the temporary file after loading the model
+    print("Model loaded successfully from Google Cloud Storage.")
+except Exception as e:
+    raise Exception(f"Error loading the model from Google Cloud Storage: {e}")
+
 # Create Flask app
 app = Flask(__name__)
 CORS(app)
